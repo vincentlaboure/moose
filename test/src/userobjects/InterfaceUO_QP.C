@@ -79,7 +79,7 @@ InterfaceUO_QP::initialize()
 void
 InterfaceUO_QP::execute()
 {
-
+  std::cout << "Interface point: " << _q_point[0] << std::endl;
   // find the entry on the map
   auto it = _map_values.find(std::make_pair(_current_elem->id(), _current_side));
   if (it != _map_values.end())
