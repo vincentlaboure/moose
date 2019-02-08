@@ -202,7 +202,7 @@ ComputeUserObjectsThread::onInterface(const Elem * elem, unsigned int side, Boun
   if (userobjs.size() == 0)
     return;
 
-  if (!((neighbor->active() && (neighbor->level() == elem->level()) && (elem_id < neighbor_id)) ||
+  if (!((neighbor->active() && (neighbor->level() == elem->level())) ||
         (neighbor->level() < elem->level())))
     return;
 
