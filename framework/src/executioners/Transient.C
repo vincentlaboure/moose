@@ -638,7 +638,14 @@ Transient::solveStep(Real input_dt)
       _time_stepper->acceptStep();
       return;
     }
+    else if (numPicardIts() == _picard_max_its)
+    {
+      _console << "Maximum number of Picard iterations reached" << std::endl;
+      _time_stepper->acceptStep();
+      return;
+    }
   }
+  // _console << "++++++++++++++++ " << current_dt << " " << _dt << " " << _time_old << " " << _time << std::endl;
 
   _dt = current_dt; // _dt might be smaller than this at this point for multistep methods
   _time = _time_old;

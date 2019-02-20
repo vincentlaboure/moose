@@ -53,6 +53,8 @@ public:
    */
   Real computeDT();
 
+  void resetFirst();
+
 private:
   /**
    * Setup the executioner for the local app.

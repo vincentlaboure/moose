@@ -331,6 +331,9 @@ MultiAppInterpolationTransfer::execute()
         {
           for (const auto & from_node : from_mesh->local_node_ptr_range())
           {
+            if (from_node->n_comp(from_sys_num, from_var_num) == 0)
+              continue;
+
             // Assuming LAGRANGE!
             dof_id_type from_dof = from_node->dof_number(from_sys_num, from_var_num, 0);
 

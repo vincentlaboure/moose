@@ -58,32 +58,38 @@
 [Executioner]
   type = Transient
   num_steps = 20
-  dt = 0.1
+  # dt = 1.0
+  # end_time = 10
   solve_type = PJFNK
   petsc_options_iname = '-pc_type -pc_hypre_type'
   petsc_options_value = 'hypre boomeramg'
-  picard_max_its = 30
+  picard_max_its = 2
   nl_abs_tol = 1e-14
 
   [./TimeStepper]
     type = IterationAdaptiveDT
+    dt = 1.0
+    time_dt = '1.0  1.0 10'
+    time_t  = '0    1.0 10'
     cutback_factor = 0.4
     growth_factor = 1.2
     optimal_iterations = 6
-    dt = 0.1
+    # dt = 0.1
   [../]
 []
 
 [Outputs]
   exodus = true
+  perf_graph = true
 []
 
 [MultiApps]
   [./sub]
     type = TransientMultiApp
-    app_type = MooseTestApp
+    app_type = SabertoothApp
     positions = '0 0 0'
     input_files = picard_adaptive_sub.i
+    sub_cycling = true
   [../]
 []
 

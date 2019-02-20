@@ -447,6 +447,8 @@ public:
   virtual void transient(bool trans) { _transient = trans; }
   virtual bool isTransient() const override { return _transient; }
 
+  virtual void rewindTo(Real t) const;
+
   virtual void
   addTimeIntegrator(const std::string & type, const std::string & name, InputParameters parameters);
   virtual void

@@ -85,6 +85,7 @@
 #include "TimeIntegrator.h"
 #include "LineSearch.h"
 #include "FloatingPointExceptionGuard.h"
+#include "TableOutput.h"
 
 #include "libmesh/exodusII_io.h"
 #include "libmesh/quadrature.h"
@@ -3537,7 +3538,7 @@ FEProblemBase::execMultiApps(ExecFlagType type, bool auto_advance)
   {
     TIME_SECTION(_exec_multi_apps_timer);
 
-    _console << COLOR_CYAN << "\nExecuting MultiApps on " << Moose::stringify(type) << COLOR_DEFAULT
+    _console << COLOR_CYAN << "\nExecuting MultiApps on " << Moose::stringify(type) << " dt=" << _dt << " time=" << _time << COLOR_DEFAULT
              << std::endl;
 
     bool success = true;
@@ -3645,7 +3646,11 @@ FEProblemBase::restoreMultiApps(ExecFlagType type, bool force)
 
     for (const auto & multi_app : multi_apps)
       if (force || multi_app->needsRestoration())
+      {
+        _console << COLOR_CYAN << "\nRestoring " << multi_app->name() << COLOR_DEFAULT << std::endl;
         multi_app->restore();
+      }
+
 
     _console << "Waiting For Other Processors To Finish" << std::endl;
     MooseUtils::parallelBarrierNotify(_communicator, _parallel_barrier_messaging);
@@ -5832,6 +5837,40 @@ bool
 FEProblemBase::constJacobian() const
 {
   return _const_jacobian;
+}
+
+void
+FEProblemBase::rewindTo(Real t) const
+{
+  timeStep() = 1;
+  time() = t;
+  timeOld() = t;
+
+  // FIXME: EXEC_TIMESTEP_END should come from the outside (most likely)
+  std::cout << "[[[ " << t  << std::endl;
+  const auto & multi_apps = _transient_multi_apps[EXEC_TIMESTEP_END].getActiveObjects();
+  for (auto tma : multi_apps)
+  {
+    std::cout << "--->>> " << multi_apps.size() << " " << tma->name() << " " << tma->numLocalApps() << " " << tma->numGlobalApps() << std::endl;
+    for (unsigned int app_index = 0; app_index < tma->numGlobalApps(); app_index++)
+    {
+      if (!tma->hasLocalApp(app_index))
+        continue;
+      FEProblemBase & fep = tma->appProblemBase(app_index);
+      fep.rewindTo(t);
+      tma->resetFirst();
+    }
+
+    // clear the tables for all nested sub-apps as well
+    for (unsigned int app_index = 0; app_index < tma->numLocalApps(); app_index++)
+    {
+      // if (!tma->hasLocalApp(app_index))
+      //   continue;
+      auto table_outputs = tma->localApp(app_index)->getOutputWarehouse().getOutputs<TableOutput>();
+      for (auto & table : table_outputs)
+        table->clear();
+    }
+  }
 }
 
 void

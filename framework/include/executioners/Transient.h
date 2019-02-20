@@ -211,6 +211,8 @@ public:
    */
   virtual Real relativeSolutionDifferenceNorm();
 
+  void resetFirst() { _first = true; }
+
 protected:
   /**
    * This should execute the solve for one timestep.

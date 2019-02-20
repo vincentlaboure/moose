@@ -229,10 +229,12 @@ TransientMultiApp::solveStep(Real dt, Real target_time, bool auto_advance)
       Real app_time_offset = _apps[i]->getGlobalTimeOffset();
 
       // Maybe this MultiApp was already solved
+      std::cout << name() << " -> " << ex->getTime() << " " << ex->endTime() << " | target = " << target_time << " | offset = " << app_time_offset << std::endl;
       if ((ex->getTime() + app_time_offset + 2e-14 >= target_time) ||
           (ex->getTime() >= ex->endTime()))
         continue;
 
+      std::cout << name() << ": 1" << std::endl;
       if (_sub_cycling)
       {
         Real time_old = ex->getTime() + app_time_offset;
@@ -376,12 +378,14 @@ TransientMultiApp::solveStep(Real dt, Real target_time, bool auto_advance)
       } // sub_cycling
       else if (_tolerate_failure)
       {
+        std::cout << name() << ": 2" << std::endl;
         ex->takeStep(dt);
         ex->endStep(target_time - app_time_offset);
         ex->postStep();
       }
       else
       {
+        std::cout << name() << ": 3" << std::endl;
         _console << "Solving Normal Step!" << std::endl;
 
         if (_first && !_app.isRecovering())
@@ -526,6 +530,8 @@ TransientMultiApp::incrementTStep()
 {
   if (!_sub_cycling)
   {
+    // print_trace();
+    // _console << "Increment Step or Reject!!!!!!!!!!!!!!!" << std::endl;
     for (unsigned int i = 0; i < _my_num_apps; i++)
     {
       Transient * ex = _transient_executioners[i];
@@ -545,6 +551,16 @@ TransientMultiApp::finishStep()
       ex->endStep();
       ex->postStep();
     }
+  }
+}
+
+void
+TransientMultiApp::resetFirst()
+{
+  for (unsigned int i = 0; i < _my_num_apps; i++)
+  {
+    Transient * ex = _transient_executioners[i];
+    ex->resetFirst();
   }
 }
 
