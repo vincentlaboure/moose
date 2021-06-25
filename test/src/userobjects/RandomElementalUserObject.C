@@ -40,6 +40,7 @@ RandomElementalUserObject::initialize()
 void
 RandomElementalUserObject::execute()
 {
+  std::cout << "RandomElementalUserObject execute!" << std::endl;
   _random_data[_current_elem->id()] = getRandomLong();
 }
 

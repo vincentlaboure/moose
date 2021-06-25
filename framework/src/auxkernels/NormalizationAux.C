@@ -37,6 +37,7 @@ NormalizationAux::NormalizationAux(const InputParameters & parameters)
 Real
 NormalizationAux::computeValue()
 {
+  std::cout << "NormalizationAux computeValue!" << std::endl;
   Real denominator = _pp_on_source ? *_pp_on_source : 1.0;
   mooseAssert(denominator != 0., "postprocessor value is zero");
   Real shift = _shift ? *_shift : 0.0;

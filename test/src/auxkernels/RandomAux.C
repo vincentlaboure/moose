@@ -51,6 +51,7 @@ RandomAux::~RandomAux() {}
 Real
 RandomAux::computeValue()
 {
+  std::cout << "RandomAux computeValue!" << std::endl;
   if (_random_uo)
     // Use the coupled UO to return a value
     return _random_uo->getElementalValue(_current_elem->id());
